@@ -4,13 +4,13 @@ import axios from 'axios';
 import "izitoast/dist/css/iziToast.min.css";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
-const input = document.querySelector('.input-search');
-const form = document.querySelector('.form-search');
+const searchInput = document.querySelector('.input-search');
+const searchForm = document.querySelector('.form-search');
 const gallery = document.querySelector('.gallery');
 const buttonSubmit = document.querySelector('.button-submit');
 const buttonLoad = document.querySelector('.button-load');
 const loader = document.querySelector('.loader');
-const perPage = 15;
+const perPage = 40;
 let page = 1;
 let totalPages = 0;
 let currentQuery = ''; 
@@ -18,17 +18,20 @@ let currentQuery = '';
 loader.hidden = true;
 buttonLoad.hidden = true;
 
-buttonSubmit.addEventListener("click", async (event) => {
+searchForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+    page = 1; 
+    gallery.innerHTML = ''; 
     try {
         const { total, hits } = await fetchPosts(page);
-        totalPages = Math.ceil(total / perPage);
+        totalPages = Math.ceil(total / hits.length); 
         renderPosts(hits);
         buttonLoad.hidden = totalPages <= 1;
     } catch (error) {
         showError('Sorry, there was an error loading images.');
     }
 });
+
 
 buttonLoad.addEventListener("click", async (event) => {
     event.preventDefault();
@@ -42,7 +45,7 @@ buttonLoad.addEventListener("click", async (event) => {
     }
 });
 
-async function fetchPosts(page, query = input.value) {
+async function fetchPosts(page, query = searchInput.value) {
     const apiKey = '42111796-9c286351ad531542ab3bfb8be';
     currentQuery = query;
     const response = await axios.get(
@@ -71,7 +74,7 @@ function renderPosts(posts) {
     });
     lightbox.on('show.simplelightbox');
     lightbox.refresh();
-    form.reset();
+    searchForm.reset();
 }
 
 function showError(message) {
@@ -85,3 +88,4 @@ function showError(message) {
         position: 'topRight',
     });
 }
+
